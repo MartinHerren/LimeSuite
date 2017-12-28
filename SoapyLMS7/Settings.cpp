@@ -532,6 +532,13 @@ SoapySDR::ArgInfoList SoapyLMS7::getFrequencyArgsInfo(const int direction, const
     return SoapySDR::Device::getFrequencyArgsInfo(direction, channel);
 }
 
+void SoapyLMS7::setFrequency(const int direction, const size_t channel, const double frequency, const SoapySDR::Kwargs &args)
+{
+    //less than 30? use distributed algorithm with NCO to help tuning
+    if (frequency < 30e6) return SoapySDR::Device::setFrequency(direction, channel, frequency, args);
+    return this->setFrequency(direction, channel, "RF", frequency, args);
+}
+
 void SoapyLMS7::setFrequency(const int direction, const size_t channel, const std::string &name, const double frequency, const SoapySDR::Kwargs &args)
 {
     std::unique_lock<std::recursive_mutex> lock(_accessMutex);
